@@ -83,6 +83,7 @@ def handle_input(val):
         print(pin)
         if(len(pin) == 4):
             if(safe.code.test(pin)):
+                pin = ""
                 entrySuccess()
                 safe.door.unlock()
                 safe.timer.set_time(60, safe_unlocked_timeout)
@@ -165,10 +166,14 @@ def main():
     def handle_door():
         if(safe.door.open == False and not safe.door.locked):
             safe.door.open = True
-            update_states();
+        elif safe.door.open and not safe.door.locked:
+            safe.door.locked = True
+            safe.door.open = False
+            safeLocked()
+            entrySuccess()
         else:
             safe.door.open = False
-            update_states();
+        update_states();
 
     testing_frame = tk.Frame(root)
     tk.Label(testing_frame, text="Testing Panel").grid(column=0, row=0)
