@@ -66,7 +66,7 @@ def handle_input(val):
             return
         
     
-    if(not safe.door.locked):
+    if(not safe.door.locked and not safe.door.open):
         if(val == "#"):
             pin = ""
             safe.timer.set_time(5, code_change_timeout)
@@ -77,7 +77,7 @@ def handle_input(val):
             return 
     
         
-    safe.timer.set_time(200, key_entry_timeout)
+    safe.timer.set_time(5, key_entry_timeout)
     if(val.isnumeric()):
         pin += val
         print(pin)
@@ -100,8 +100,8 @@ def handle_input(val):
 def update_states():
     global safe_state, door_state
     
-    lock_state_text = "Locked" if safe.door.locked else "Unlocked"
-    door_state_text = "Open" if safe.door.open else "Closed"
+    lock_state_text = "LOCKED" if safe.door.locked else "UNLOCKED"
+    door_state_text = "OPEN" if safe.door.open else "CLOSED"
         
     safe_state.set(f"Safe is {lock_state_text}")
     door_state.set(f"Door is {door_state_text}")
@@ -162,9 +162,18 @@ def main():
         else:
             led_state.configure(bg="red")
 
+    def handle_door():
+        if(safe.door.open == False and not safe.door.locked):
+            safe.door.open = True
+            update_states();
+        else:
+            safe.door.open = False
+            update_states();
+
     testing_frame = tk.Frame(root)
     tk.Label(testing_frame, text="Testing Panel").grid(column=0, row=0)
     tk.Checkbutton(testing_frame, text="Low-Power", command=check_led).grid(column=0, row=1)
+    tk.Button(testing_frame,text="Open/Close Door", command=handle_door).grid(column=0, row=2)
     testing_frame.grid(column=1, row=0)
 
     safe_state = tk.StringVar();
