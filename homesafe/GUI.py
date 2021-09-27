@@ -1,4 +1,5 @@
 import tkinter as tk
+import component_apis
 from tkinter.constants import END
 
 btn_list = [
@@ -49,7 +50,6 @@ def create_entry(container):
 def main():
     global safe_state, door_state
 
-
     root = tk.Tk()
     root.title=("Safe")
     root.geometry("800x600")
@@ -66,13 +66,20 @@ def main():
     # Creates LED panel
     led_frame = tk.Frame(root)
     tk.Label(led_frame, text="LED: ").grid(column=0, row=0)
-    led_state = tk.Canvas(led_frame, bg="green", height=15, width= 15).grid(column=1, row=0)
+    led_state = tk.Canvas(led_frame, bg="green", height=15, width= 15)
+    led_state.grid(column=1, row=0)
     led_frame.grid(column=0, row=2)
 
     # Create Testing panel
+    def check_led():
+        if(led_state['bg'] == "red"):
+            led_state.configure(bg="green")
+        else:
+            led_state.configure(bg="red")
+
     testing_frame = tk.Frame(root)
     tk.Label(testing_frame, text="Testing Panel").grid(column=0, row=0)
-    tk.Checkbutton(testing_frame, text="Low-Power").grid(column=0, row=1)
+    tk.Checkbutton(testing_frame, text="Low-Power", command=check_led).grid(column=0, row=1)
     testing_frame.grid(column=1, row=0)
 
     safe_state = tk.StringVar();
