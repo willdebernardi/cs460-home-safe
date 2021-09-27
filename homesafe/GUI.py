@@ -122,15 +122,6 @@ def create_numpad(container):
 
     return frame
 
-def create_entry(container):
-    global entry_box
-
-    frame = tk.Frame(container)
-    entry_box = tk.Entry(frame, width=30)
-    entry_box.grid(column=0, row=0)
-
-    return frame
-
 def main():
     global safe_state, door_state, pin
     
@@ -142,11 +133,8 @@ def main():
     root.columnconfigure(0, weight=2)
     root.columnconfigure(1, weight=1)
 
-    entry_frame = create_entry(root)
-    entry_frame.grid(column=0, row= 0)
-
     keypad_frame = create_numpad(root)
-    keypad_frame.grid(column=0, row =1)
+    keypad_frame.grid(column=0, row =0)
 
 
     # Creates LED panel
@@ -154,7 +142,7 @@ def main():
     tk.Label(led_frame, text="LED: ").grid(column=0, row=0)
     led_state = tk.Canvas(led_frame, bg="green", height=15, width= 15)
     led_state.grid(column=1, row=0)
-    led_frame.grid(column=0, row=2)
+    led_frame.grid(column=0, row=1)
 
     # Create Testing panel
     def check_led():
