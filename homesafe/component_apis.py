@@ -25,6 +25,8 @@ class Timer:
         self.timer = None
         
     def set_time(self, s, timeout_func, *args):
+        if(self.timer != None):
+            self.timer.cancel()
         self.timer = threading.Timer(s, timeout_func, args)
         self.timer.start()
         

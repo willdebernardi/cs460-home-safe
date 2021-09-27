@@ -1,27 +1,110 @@
 import tkinter as tk
-import component_apis
+from component_apis import *
 from tkinter.constants import END
 
 btn_list = [
     '1', '2', '3',
     '4', '5', '6',
     '7', '8', '9', 
-    'Del', '0', '*'
+    'Del', '0', '#'
 ]
+class Safe:
+    def __init__(self):
+        self.timer = Timer()
+        self.door = Door()
+        self.code = SafeCode()
+        self.code_change_requested = False
 
 entry_box = ""
 safe_state = ""
 door_state = ""
+pin = ""
+safe = Safe()
+
+def key_entry_timeout():
+    print("Key entry timeout called")
+    global pin 
+    
+    pin = ""
+    entryFailure()
+    update_states()
+    
+def safe_unlocked_timeout():
+    print("Safe unlocked timeout called")
+    global safe
+    
+    safe.door.lock()
+    safeLocked()
+    entryFailure()
+    update_states()
+    
+def code_change_timeout():
+    global pin, safe 
+    safe.timer.set_time(60, safe_unlocked_timeout)
+    pin = ""
+    entryFailure()
+    update_states()
+    
 
 def handle_input(val):
-    global entry_box, safe_state
-    entry_box.insert(END, val)
-
-    if(len(entry_box.get()) == 4):
-        print("code entered")
-        # HANDLE ENTRY LOGIC HERE
-        safe_state.set("Safe is UNLOCKED")
-        door_state.set("Door is OPEN")
+    global pin, safe
+    
+    if(safe.code_change_requested):
+        if(val.isnumeric()):
+            pin += val
+            safe.timer.set_time(5, code_change_timeout)
+            if(len(pin) > 3):
+                safe.code.set_code(pin)
+                safe.timer.set_time(5, safe_unlocked_timeout)
+                pin = ""
+                entrySuccess()
+                safe.code_change_requested = False
+            return
+        else:
+            code_change_timeout()
+            safe.code_change_requested = False
+            return
+        
+    
+    if(not safe.door.locked):
+        if(val == "#"):
+            pin = ""
+            safe.timer.set_time(5, code_change_timeout)
+            safe.code_change_requested = True
+            return
+        else:
+            entryFailure()
+            return 
+    
+        
+    safe.timer.set_time(200, key_entry_timeout)
+    if(val.isnumeric()):
+        pin += val
+        print(pin)
+        if(len(pin) == 4):
+            if(safe.code.test(pin)):
+                entrySuccess()
+                safe.door.unlock()
+                safe.timer.set_time(60, safe_unlocked_timeout)
+                update_states()
+            else:
+                print("Entry failed")
+                safe.timer.reset()
+                pin = ""
+                entryFailure()
+                update_states()
+    else:
+        key_entry_timeout()
+    
+    
+def update_states():
+    global safe_state, door_state
+    
+    lock_state_text = "Locked" if safe.door.locked else "Unlocked"
+    door_state_text = "Open" if safe.door.open else "Closed"
+        
+    safe_state.set(f"Safe is {lock_state_text}")
+    door_state.set(f"Door is {door_state_text}")
 
 def create_numpad(container):
     frame = tk.Frame(container)
@@ -48,7 +131,9 @@ def create_entry(container):
     return frame
 
 def main():
-    global safe_state, door_state
+    global safe_state, door_state, pin
+    
+    # safe = Safe()
 
     root = tk.Tk()
     root.title=("Safe")
@@ -95,5 +180,21 @@ def main():
 
     
     root.mainloop()
+    
+
+def entrySuccess():
+    print("entry success called")
+    return
+def entryFailure():
+    return
+def batteryLow():
+    return
+def batteryFine():
+    return
+def safeUnlocked():
+    print("safe unlocked notification called")
+    return
+def safeLocked():
+    return
 
 main()
