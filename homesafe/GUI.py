@@ -49,13 +49,12 @@ def create_entry(container):
 def main():
     global safe_state, door_state
 
+
     root = tk.Tk()
     root.title=("Safe")
     root.geometry("800x600")
-    root.columnconfigure(0, weight=1)
-    # root.rowconfigure(0)
-    # root.rowconfigure(1)
-    # root.rowconfigure(2)
+    root.columnconfigure(0, weight=2)
+    root.columnconfigure(1, weight=1)
 
     entry_frame = create_entry(root)
     entry_frame.grid(column=0, row= 0)
@@ -63,13 +62,28 @@ def main():
     keypad_frame = create_numpad(root)
     keypad_frame.grid(column=0, row =1)
 
+
+    # Creates LED panel
+    led_frame = tk.Frame(root)
+    tk.Label(led_frame, text="LED: ").grid(column=0, row=0)
+    led_state = tk.Canvas(led_frame, bg="green", height=15, width= 15).grid(column=1, row=0)
+    led_frame.grid(column=0, row=2)
+
+    # Create Testing panel
+    testing_frame = tk.Frame(root)
+    tk.Label(testing_frame, text="Testing Panel").grid(column=0, row=0)
+    tk.Checkbutton(testing_frame, text="Low-Power").grid(column=0, row=1)
+    testing_frame.grid(column=1, row=0)
+
     safe_state = tk.StringVar();
     safe_state.set("Safe is LOCKED")
-    tk.Label(root, textvariable=safe_state).grid(column=0, row=2)
+    tk.Label(root, textvariable=safe_state).grid(column=0, row=3)
 
     door_state = tk.StringVar();
     door_state.set("Door is CLOSED")
-    tk.Label(root, textvariable=door_state).grid(column=0, row=3)
+    tk.Label(root, textvariable=door_state).grid(column=0, row=4)
+
+
 
 
     
