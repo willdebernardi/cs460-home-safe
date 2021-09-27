@@ -1,12 +1,19 @@
-    """[summary]
-    Contains components API classes and functions. 
-    """
+
+import time
+import threading
+
+
 # def Door():
-    
+
 # def KeyPad():
-    
-# def Timer():
-    
+
+def Timer():
+ t = 5
+ for i in range(t):
+    print(str(t-i) + " seconds remain")
+    time.sleep(1)
+
+
 # def SafeCode():
-    
+
 # def notifications():
