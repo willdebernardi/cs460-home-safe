@@ -1,13 +1,12 @@
 import tkinter as tk
 from component_apis import *
-from tkinter.constants import END
 from playsound import playsound
 
 btn_list = [
     '1', '2', '3',
     '4', '5', '6',
     '7', '8', '9', 
-    'Del', '0', '#'
+    '-', '0', '#'
 ]
 class Safe:
     def __init__(self):

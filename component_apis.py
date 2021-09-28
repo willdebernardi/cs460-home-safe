@@ -1,5 +1,4 @@
 from passlib.hash import pbkdf2_sha256 as encrypt
-import threading
 
 class Door:
     def __init__(self):
