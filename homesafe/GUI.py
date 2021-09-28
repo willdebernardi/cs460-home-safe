@@ -1,6 +1,7 @@
 import tkinter as tk
 from component_apis import *
 from tkinter.constants import END
+from playsound import playsound
 
 btn_list = [
     '1', '2', '3',
@@ -39,7 +40,7 @@ def safe_unlocked_timeout():
     update_states()
     
 def code_change_timeout():
-    global pin, safe 
+    global pin, safe
     safe.timer.set_time(60, safe_unlocked_timeout)
     pin = ""
     entryFailure()
@@ -56,7 +57,7 @@ def handle_input(val):
             safe.timer.set_time(5, code_change_timeout)
             if(len(pin) > 3):
                 safe.code.set_code(pin)
-                safe.timer.set_time(5, safe_unlocked_timeout)
+                safe.timer.set_time(60, safe_unlocked_timeout)
                 pin = ""
                 entrySuccess()
                 safe.code_change_requested = False
@@ -127,10 +128,10 @@ def create_numpad(container):
 def main():
     global safe_state, door_state, pin
     
-    # safe = Safe()
 
     root = tk.Tk()
     root.title=("Safe")
+    safe.timer.root = root
     # root.geometry("800x600")
     root.columnconfigure(0, weight=2)
     root.columnconfigure(1, weight=1)
@@ -188,8 +189,11 @@ def main():
 
 def entrySuccess():
     print("entry success called")
+    playsound("beep.wav")
     return
 def entryFailure():
+    for _ in range(3):
+        playsound("beep.wav")
     return
 def batteryLow():
     return

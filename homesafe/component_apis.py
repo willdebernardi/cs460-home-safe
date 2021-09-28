@@ -13,25 +13,26 @@ class Door:
     def unlock(self):
         self.locked = False
         
-    def open_door(self):
-        return self.open
+    # def open_door(self):
+    #     return self.open
     
-    def locked_door(self):
-        return self.locked
+    # def locked_door(self):
+    #     return self.locked
     
     
 class Timer:
     def __init__(self):
-        self.timer = None
+        self.root = None
+        self.ID = None
         
     def set_time(self, s, timeout_func, *args):
-        if(self.timer != None):
-            self.timer.cancel()
-        self.timer = threading.Timer(s, timeout_func, args)
-        self.timer.start()
+        if(self.ID != None):
+            self.root.after_cancel(self.ID)
+        self.ID = self.root.after(s * 1000, timeout_func)
         
     def reset(self):
-        self.timer.cancel()
+        self.root.after_cancel(self.ID)
+    
     
 class SafeCode:
     def __init__(self):
