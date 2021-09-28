@@ -15,6 +15,7 @@ class Safe:
         self.door = Door()
         self.code = SafeCode()
         self.code_change_requested = False
+        self.battery_low = False
 
 entry_box = ""
 safe_state = ""
@@ -56,6 +57,7 @@ def handle_input(val):
             pin += val
             safe.timer.set_time(5, code_change_timeout)
             if(len(pin) > 3):
+                
                 safe.code.set_code(pin)
                 safe.timer.set_time(60, safe_unlocked_timeout)
                 pin = ""
@@ -89,6 +91,7 @@ def handle_input(val):
                 pin = ""
                 entrySuccess()
                 safe.door.unlock()
+                update_led()
                 safe.timer.set_time(60, safe_unlocked_timeout)
                 update_states()
             else:
@@ -102,13 +105,19 @@ def handle_input(val):
     
     
 def update_states():
-    global safe_state, door_state
+    global safe_state, door_state, reset_button
     
     lock_state_text = "LOCKED" if safe.door.locked else "UNLOCKED"
     door_state_text = "OPEN" if safe.door.open else "CLOSED"
         
     safe_state.set(f"Safe is {lock_state_text}")
     door_state.set(f"Door is {door_state_text}")
+    
+    if(not safe.door.locked and safe.door.open):
+        reset_button.grid()
+    else:
+        reset_button.grid_remove()
+    update_led()
 
 def create_numpad(container):
     frame = tk.Frame(container)
@@ -126,7 +135,7 @@ def create_numpad(container):
     return frame
 
 def main():
-    global safe_state, door_state, pin
+    global safe_state, door_state, pin, led_state, reset_button
     
 
     root = tk.Tk()
@@ -143,16 +152,14 @@ def main():
     # Creates LED panel
     led_frame = tk.Frame(root)
     tk.Label(led_frame, text="LED: ").grid(column=0, row=0)
-    led_state = tk.Canvas(led_frame, bg="green", height=15, width= 15)
+    led_state = tk.Canvas(led_frame, bg="red", height=15, width= 15)
     led_state.grid(column=1, row=0)
     led_frame.grid(column=0, row=1)
 
     # Create Testing panel
-    def check_led():
-        if(led_state['bg'] == "red"):
-            led_state.configure(bg="green")
-        else:
-            led_state.configure(bg="red")
+    def set_battery_state():
+        safe.battery_low = not safe.battery_low
+        update_led()
 
     def handle_door():
         if(safe.door.open == False and not safe.door.locked):
@@ -165,11 +172,17 @@ def main():
         else:
             safe.door.open = False
         update_states();
+        
+    def reset_password():
+        safe.code.reset()
 
     testing_frame = tk.Frame(root)
     tk.Label(testing_frame, text="Testing Panel").grid(column=0, row=0)
-    tk.Checkbutton(testing_frame, text="Low-Power", command=check_led).grid(column=0, row=1)
+    tk.Checkbutton(testing_frame, text="Low-Power", command=set_battery_state).grid(column=0, row=1)
     tk.Button(testing_frame,text="Open/Close Door", command=handle_door).grid(column=0, row=2)
+    reset_button = tk.Button(testing_frame, text="Reset", command=reset_password)
+    reset_button.grid(column=0, row=3)
+    reset_button.grid_remove()
     testing_frame.grid(column=1, row=0)
 
     safe_state = tk.StringVar();
@@ -180,11 +193,18 @@ def main():
     door_state.set("Door is CLOSED")
     tk.Label(root, textvariable=door_state).grid(column=0, row=4)
 
-
-
-
     
     root.mainloop()
+    
+def update_led():
+    global led_state, safe
+    
+    if(safe.battery_low):
+        led_state.configure(bg="yellow")
+    elif(safe.door.locked):
+        led_state.configure(bg="red")
+    else:
+        led_state.configure(bg="green")
     
 
 def entrySuccess():
@@ -195,14 +215,13 @@ def entryFailure():
     for _ in range(3):
         playsound("beep.wav")
     return
-def batteryLow():
-    return
-def batteryFine():
-    return
+
 def safeUnlocked():
     print("safe unlocked notification called")
+    update_led()
     return
 def safeLocked():
+    update_led()
     return
 
 main()
