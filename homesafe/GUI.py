@@ -49,6 +49,7 @@ def code_change_timeout():
 def handle_input(val):
     global pin, safe
     
+    # Resetting passcode
     if(safe.code_change_requested):
         if(val.isnumeric()):
             pin += val
@@ -65,19 +66,20 @@ def handle_input(val):
             safe.code_change_requested = False
             return
         
-    
+    # Allows password reset when the door is closed and safe unlocked
     if(not safe.door.locked and not safe.door.open):
-        if(val == "#"):
+        if(val == "#"): # Password reset key
             pin = ""
             safe.timer.set_time(5, code_change_timeout)
             safe.code_change_requested = True
             return
-        else:
+        else: # Ignore other keys
             entryFailure()
             return 
     
         
     safe.timer.set_time(5, key_entry_timeout)
+    # Normal entry when safe is locked
     if(val.isnumeric()):
         pin += val
         print(pin)
@@ -129,7 +131,7 @@ def main():
 
     root = tk.Tk()
     root.title=("Safe")
-    root.geometry("800x600")
+    # root.geometry("800x600")
     root.columnconfigure(0, weight=2)
     root.columnconfigure(1, weight=1)
 
