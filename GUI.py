@@ -125,7 +125,7 @@ def create_numpad(container):
     c = 0
     for b in btn_list:
         cmd = lambda button=b: handle_input(button)
-        b = tk.Button(frame, text=b, width=10, command=cmd).grid(row=r, column=c)
+        b = tk.Button(frame, text=b, width=10, height=8, command=cmd).grid(row=r, column=c)
         c += 1
         if c > 2:
             c = 0
@@ -150,7 +150,7 @@ def main():
 
     # Creates LED panel
     led_frame = tk.Frame(root)
-    tk.Label(led_frame, text="LED: ").grid(column=0, row=0)
+    tk.Label(led_frame, text="LED: ", font=("Arial", 25)).grid(column=0, row=0)
     led_state = tk.Canvas(led_frame, bg="red", height=15, width= 15)
     led_state.grid(column=1, row=0)
     led_frame.grid(column=0, row=1)
@@ -176,21 +176,21 @@ def main():
         safe.code.reset()
 
     testing_frame = tk.Frame(root)
-    tk.Label(testing_frame, text="Testing Panel").grid(column=0, row=0)
+    tk.Label(testing_frame, text="Testing Panel", font=("Arial", 25)).grid(column=0, row=0)
     tk.Checkbutton(testing_frame, text="Low-Power", command=set_battery_state).grid(column=0, row=1)
     tk.Button(testing_frame,text="Open/Close Door", command=handle_door).grid(column=0, row=2)
     reset_button = tk.Button(testing_frame, text="Reset", command=reset_password)
     reset_button.grid(column=0, row=3)
     reset_button.grid_remove()
-    testing_frame.grid(column=1, row=0)
+    testing_frame.grid(column=1, row=0, sticky="NSEW")
 
     safe_state = tk.StringVar();
     safe_state.set("Safe is LOCKED")
-    tk.Label(root, textvariable=safe_state).grid(column=0, row=3)
+    tk.Label(root, textvariable=safe_state, font=("Arial", 25)).grid(column=0, row=3)
 
     door_state = tk.StringVar();
     door_state.set("Door is CLOSED")
-    tk.Label(root, textvariable=door_state).grid(column=0, row=4)
+    tk.Label(root, textvariable=door_state, font=("Arial", 25)).grid(column=0, row=4)
 
     
     root.mainloop()
